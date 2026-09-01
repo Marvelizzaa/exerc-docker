@@ -1,0 +1,45 @@
+
+services:
+  # 1. Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: db_tertes
+      MYSQL_USER: user_app
+      MYSQL_PASSWORD: userpassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 2. Web App (PHP + Apache dengan MySQLi)
+  web:
+    image: php:8.1-apache
+    container_name: web_app
+    restart: always
+    # Menambahkan perintah install & enable mysqli otomatis saat container start
+    command: sh -c "docker-php-ext-install mysqli && apache2-foreground"
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+
+  # 3. phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: my_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
