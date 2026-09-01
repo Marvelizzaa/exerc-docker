@@ -1,0 +1,30 @@
+services:
+  ntp_server:
+    image: dockurr/chrony:latest
+    container_name: ntp_chrony
+    restart: unless-stopped
+    cap_add:
+      - SYS_TIME
+    environment:
+      - NTP_SERVERS=0.id.pool.ntp.org,1.id.pool.ntp.org,2.id.pool.ntp.org
+      - ALLOW=192.168.100.0/24
+    networks:
+      ntp_net:
+        ipv4_address: 192.168.100.10
+
+  ntp_client:
+    image: alpine:latest
+    container_name: ntp_client
+    command: sleep infinity
+    cap_add:
+      - SYS_TIME
+    networks:
+      ntp_net:
+        ipv4_address: 192.168.100.20
+
+networks:
+  ntp_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24

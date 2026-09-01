@@ -1,0 +1,44 @@
+
+services:
+  dhcp-server:
+    image: networkboot/dhcpd
+    container_name: dhcp-server
+    command: eth0
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./dhcp-data:/data
+    networks:
+      dhcp_net:
+        ipv4_address: 172.16.16.10
+    restart: always
+
+  ntp-server:
+    image: cturra/ntp
+    container_name: ntp-server
+    environment:
+      - NTP_SERVERS=pool.ntp.org
+    networks:
+      dhcp_net:
+        ipv4_address: 172.16.16.5
+    restart: always
+
+  dhcp-client-1:
+    image: alpine
+    container_name: dhcp-client-1
+    command: tail -f /dev/null
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
+    networks:
+      dhcp_net:
+        # IP dinamis diserahin ke DHCP Server / Docker network
+    restart: "no"
+
+networks:
+  dhcp_net:
+    name: dhcp_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.16.0/20

@@ -1,0 +1,35 @@
+
+services:
+  # --- 1. DHCP SERVER ---
+  dhcp-server:
+    image: networkboot/dhcpd:latest
+    container_name: dhcp-server
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    networks:
+      lab_net:
+        ipv4_address: 13.13.13.2
+    volumes:
+      - ./dhcpd.conf:/data/dhcpd.conf
+    command: eth0
+
+  # --- 2. CLIENT (Simulasi Client yang Minta IP) ---
+  dhcp-client:
+    image: alpine:latest
+    container_name: dhcp-client
+    restart: always
+    depends_on:
+      - dhcp-server
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - lab_net
+    command: tail -f /dev/null
+# --- 3. DOCKER CUSTOM NETWORK ---
+networks:
+  lab_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 13.13.13.0/24

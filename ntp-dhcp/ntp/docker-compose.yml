@@ -1,0 +1,10 @@
+
+services:
+  ntp-server:
+    image: cturra/ntp:latest
+    container_name: ntp-server
+    restart: always
+    ports:
+      - "123:123/udp"
+    environment:
+      - NTP_SERVERS=0.id.pool.ntp.org,1.id.pool.ntp.org,2.id.pool.ntp.org,3.id.pool.ntp.org
