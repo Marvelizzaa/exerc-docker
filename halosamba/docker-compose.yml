@@ -13,8 +13,8 @@ services:
       - ./data:/data
 
     command: >
-      -u "guru;123"
-      -s "siswa;/data/siswa;yes;no;yes"
-      -s "guru;/data/guru;yes;no;no;guru"
+      -u "presiden;123"
+      -s "mentri;/data/mentri;yes;no;yes"
+      -s "presiden;/data/presiden;yes;no;no;presiden"
 
     restart: unless-stopped
