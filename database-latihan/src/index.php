@@ -140,7 +140,7 @@ $result = $conn->query("SELECT * FROM siswa ORDER BY id DESC");
             margin-bottom: 4px;
         }
 
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], select {
             font-family: 'Inter', sans-serif;
             padding: 8px 12px;
             border: 2px solid var(--panel-border);
@@ -317,9 +317,15 @@ $result = $conn->query("SELECT * FROM siswa ORDER BY id DESC");
                 <tbody>
                     <?php if ($result->num_rows > 0): ?>
                         <?php while($row = $result->fetch_assoc()): 
-                            $total = ($row['nilai_tugas'] * 0.3) + ($row['nilai_uts'] * 0.3) + ($row['nilai_uas'] * 0.4);
+                            // Menggunakan operator null coalescing (?? 0) agar tidak error jika kolom belum ada/kosong
+                            $absen = $row['absen'] ?? 0;
+                            $tugas = $row['nilai_tugas'] ?? 0;
+                            $uts   = $row['nilai_uts'] ?? 0;
+                            $uas   = $row['nilai_uas'] ?? 0;
+
+                            $total = ($tugas * 0.3) + ($uts * 0.3) + ($uas * 0.4);
                             $total_fmt = number_format($total, 1);
-                            $is_passed = ($total >= 75 && $row['absen'] >= 75);
+                            $is_passed = ($total >= 75 && $absen >= 75);
                             $status_str = $is_passed ? 'LULUS' : 'REMIDI';
                         ?>
                             <tr>
@@ -327,10 +333,10 @@ $result = $conn->query("SELECT * FROM siswa ORDER BY id DESC");
                                     <strong><?= htmlspecialchars($row['nama']) ?></strong><br>
                                     <small style="color: #7f8c8d;"><?= htmlspecialchars($row['kelas']) ?></small>
                                 </td>
-                                <td><?= $row['absen'] ?>%</td>
-                                <td><?= $row['nilai_tugas'] ?></td>
-                                <td><?= $row['nilai_uts'] ?></td>
-                                <td><?= $row['nilai_uas'] ?></td>
+                                <td><?= $absen ?>%</td>
+                                <td><?= $tugas ?></td>
+                                <td><?= $uts ?></td>
+                                <td><?= $uas ?></td>
                                 <td><strong><?= $total_fmt ?></strong></td>
                                 <td data-status="<?= $status_str ?>">
                                     <span class="badge <?= $is_passed ? 'status-pass' : 'status-fail' ?>">
