@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db_sederhana
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_sederhanaok
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  web:
+    image: php:8.1-apache
+    container_name: web_sederhana
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      - db
+    entrypoint: >
+      sh -c "docker-php-ext-install mysqli && docker-php-ext-enable mysqli && apache2-foreground"
