@@ -1,0 +1,30 @@
+services:
+  mailserver:
+    image: analogic/poste.io
+    container_name: mailserver
+    hostname: mail.latihanmailserver.com
+    environment:
+      - TZ=Asia/Jakarta
+      - HTTPS=OFF          
+      - DISABLE_CLAMAV=TRUE
+      - DISABLE_RSPAMD=FALSE
+    ports:
+      - "8080:80"  
+      - "25:25"
+      - "587:587"
+      - "993:993"
+    volumes:
+      - ./data:/data
+    restart: always
+
+  web:
+    image: nginx:alpine
+    container_name: website
+    ports:
+      - "80:80"
+    volumes:
+      - ./website:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - mailserver
+    restart: always
